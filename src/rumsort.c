@@ -44,9 +44,19 @@
 #else
 #define LogicalTapeSetCreate(X) LogicalTapeSetCreate(X, NULL, NULL, 1)
 #endif
+#if PG_VERSION_NUM < 150000
 #define LogicalTapeFreeze(X, Y) LogicalTapeFreeze(X, Y, NULL)
 #endif
+#endif
 
+#if PG_VERSION_NUM >= 150000
+#define LogicalTapeRead(w, x, y, z) LogicalTapeRead (w[x], y, z)
+#define LogicalTapeWrite(w, x, y, z) LogicalTapeWrite (w[x], y, z)
+#define LogicalTapeBackspace(x, y, z) LogicalTapeBackspace (x[y], z)
+#define LogicalTapeRewindForRead(x, y, z) LogicalTapeRewindForRead(x[y], z)
+#define LogicalTapeRewindForWrite(x, y) LogicalTapeClose(x[y])
+#define LogicalTapeFreeze(x, y) LogicalTapeFreeze(x[y], NULL)
+#endif
 /*
  * Below are copied definitions from src/backend/utils/sort/tuplesort.c.
  */
@@ -107,8 +117,14 @@ struct RumTuplesortstate
 	int			maxTapes;		/* number of tapes (Knuth's T) */
 	int			tapeRange;		/* maxTapes-1 (Knuth's P) */
 	MemoryContext sortcontext;	/* memory context holding all sort data */
+#if PG_VERSION_NUM >= 150000
+	LogicalTape    *tapeset;		/*
+								 * Since c4649cce39a4 *tapeset, number pairs are replaced by *tape[number] array
+								 * We leave new type under old name for to minimize change under ifdefs
+								 */
+#else
 	LogicalTapeSet *tapeset;	/* logtape.c object for tapes in a temp file */
-
+#endif
 	/*
 	 * These function pointers decouple the routines that must know what kind
 	 * of tuple we are sorting from the routines that don't need to know it.
@@ -687,7 +703,6 @@ rum_tuplesort_begin_common(int workMem, bool randomAccess)
 	state->availMem = state->allowedMem;
 	state->sortcontext = sortcontext;
 	state->tapeset = NULL;
-
 	state->memtupcount = 0;
 
 	/*
