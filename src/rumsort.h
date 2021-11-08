@@ -19,13 +19,14 @@
 
 #include "postgres.h"
 #include "fmgr.h"
+#include "utils/tuplesort.h"
 
 #include "executor/tuptable.h"
 
 /* RumTuplesortstate is an opaque type whose details are not known outside
  * rumsort.c.
  */
-typedef struct RumTuplesortstate RumTuplesortstate;
+typedef Tuplesortstate RumTuplesortstate;
 struct RumScanItem;
 
 typedef struct
