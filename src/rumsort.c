@@ -767,7 +767,10 @@ rum_tuplesort_begin_rumitem(int workMem, FmgrInfo *cmp)
 	RumTuplesortstate *state = rum_tuplesort_begin_common(workMem, false);
 	MemoryContext oldcontext;
 
-	oldcontext = MemoryContextSwitchTo(state->sortcontext);
+if (cmp)
+       elog(WARNING, "cmp != 0; rum_tuplesort_begin_rumitem");
+
+oldcontext = MemoryContextSwitchTo(state->sortcontext);
 
 #ifdef TRACE_SORT
 	if (trace_sort)
