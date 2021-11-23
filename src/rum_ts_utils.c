@@ -278,6 +278,7 @@ checkcondition_rum(void *checkval, QueryOperand *val, ExecPhraseData *data)
 		WordEntryPos post = 0;
 		int32		npos;
 		int32		k = 0;
+		char *		ai = ((char *)gcv->addInfo);
 
 		/*
 		 * we don't have positions in index because we store a timestamp in
@@ -285,7 +286,10 @@ checkcondition_rum(void *checkval, QueryOperand *val, ExecPhraseData *data)
 		 */
 		if (gcv->recheckPhrase)
 			return ((val->weight) ? TS_MAYBE : TS_YES);
-
+//		if (!((char *)gcv->addInfo)[j])
+//			return TS_MAYBE;
+				elog(WARNING, "j,  gcv->addInfo[j], %u, %u, %u, %u, %u, %u, %u, %u", j, ai[0], ai[1],
+				ai[2],ai[3],ai[4],ai[5],ai[6]);
 		positions = DatumGetByteaP(gcv->addInfo[j]);
 		ptrt = (char *) VARDATA_ANY(positions);
 		npos = count_pos(VARDATA_ANY(positions),
@@ -317,7 +321,6 @@ checkcondition_rum(void *checkval, QueryOperand *val, ExecPhraseData *data)
 			data->pos = repalloc(data->pos, sizeof(*data->pos) * k);
 			return (k ? TS_YES : TS_NO);
 		}
-
 		/*
 		 * Not phrase search. We only need to know if there's at least one
 		 * position with right weight then return TS_YES, otherwise return
