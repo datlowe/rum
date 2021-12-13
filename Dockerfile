@@ -3,6 +3,8 @@ FROM postgres:14
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && apt-get install -y \
     build-essential \
+    bison \
+    flex \
     curl \
     devscripts \
     equivs \
@@ -29,8 +31,7 @@ RUN make USE_PGXS=1
 RUN make USE_PGXS=1 install
 # RUN make USE_PGXS=1 installcheck
 
-#OUR filse are here:
-
+#OUR files are here:
 #/usr/lib/postgresql/14/lib/rum.so
 #/usr/share/postgresql/14/extension/rum--1.2--1.3.sql
 #/usr/share/postgresql/14/extension/rum--1.0--1.1.sql
@@ -38,3 +39,18 @@ RUN make USE_PGXS=1 install
 #/usr/share/postgresql/14/extension/rum.control
 #/usr/share/postgresql/14/extension/rum--1.1--1.2.sql
 #/usr/share/postgresql/14/extension/rum--1.0.sql
+
+
+#COPY them:
+# docker create --name rum_build rum_build
+# mkdir RUM_1.3
+# mkdir RUM_1.3/lib
+# docker cp rum_build://usr/lib/postgresql/14/lib/rum.so RUM_1.3/lib/
+# mkdir RUM_1.3/extension
+# docker cp rum_build://usr/share/postgresql/14/extension/rum--1.2--1.3.sql RUM_1.3/extension/
+# docker cp rum_build://usr/share/postgresql/14/extension/rum--1.0--1.1.sql RUM_1.3/extension/
+# docker cp rum_build://usr/share/postgresql/14/extension/rum--1.3.sql RUM_1.3/extension/
+# docker cp rum_build://usr/share/postgresql/14/extension/rum.control RUM_1.3/extension/
+# docker cp rum_build://usr/share/postgresql/14/extension/rum--1.1--1.2.sql RUM_1.3/extension/
+# docker cp rum_build://usr/share/postgresql/14/extension/rum--1.0.sql RUM_1.3/extension/
+# docker rm rum_build
